@@ -15,7 +15,7 @@
 # The saved Wi-Fi network was created by com.google.android.tungsten.setupwraith (cname= in dumpsys wifi),
 # so setupwraith stays until that network is forgotten and re-joined in Settings.
 #
-# Applied in two batches on 2026-10-20 with tools/disable.ps1 from Windows, over wireless debugging
+# Applied in three batches on 2026-10-20 with tools/disable.ps1 from Windows, over wireless debugging
 # (adb pair, then adb tcpip 5555 for tools/tv.py). No package was skipped by the Home, setupwraith or
 # TV_INPUT_HARDWARE guards. After each batch: Home still launcherx, Wi-Fi connected, internet up,
 # dumpsys tv_input still listed 10 inputs. Lived with for less than the few days CONTRIBUTING.md asks;
@@ -34,7 +34,9 @@ com.tcl.browser                        # TCL "BrowseHere" browser and web-video 
 com.google.android.play.games
 com.google.android.feedback
 com.android.tv.feedbackconsent
-# com.google.android.katniss           # Google Assistant voice (mic button): kept on by choice
+
+# Batch 3: voice, applied later the same day
+com.google.android.katniss             # Google Assistant voice (mic button), about 50 MB in two processes here; off by choice, the mic button then does nothing
 
 # Not disabled on this unit (see examples/tcl-43s5k for the launcher/ steps):
 # com.google.android.tungsten.setupwraith   # owns the saved Wi-Fi here; re-join the network first
