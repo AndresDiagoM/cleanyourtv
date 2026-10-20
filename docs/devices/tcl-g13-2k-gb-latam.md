@@ -8,7 +8,7 @@ Lista base: [`examples/tcl-43s5k/debloat.txt`](../../examples/tcl-43s5k/debloat.
 
 | Campo | Valor observado |
 |---|---|
-| Modelo comercial | No lo expone el firmware (`ro.product.model` = `Smart TV`) |
+| Modelo comercial | **TCL 50S5K QLED**, Colombia (según la etiqueta; el firmware solo dice `Smart TV`, y `persist.tv.client_sku` = `co`) |
 | `ro.product.manufacturer` / `brand` | `TCL` / `TCL` |
 | `ro.product.device` | `G13` |
 | `ro.product.name` | `G13_2K_GB` |
@@ -50,7 +50,7 @@ Lista base: [`examples/tcl-43s5k/debloat.txt`](../../examples/tcl-43s5k/debloat.
 | Paquete | Decisión | Motivo |
 |---|---|---|
 | `com.tcl.ttvs` | Activo | Es analítica de TCL **y** el actualizador de firmware |
-| `com.google.android.katniss` | Activo | Asistente de Google; sin él el botón del micrófono no funciona |
+| `com.google.android.katniss` | Desactivado (lote 3) | Asistente de Google; el dueño no lo usa. Sin él, el botón del micrófono no hace nada |
 | `com.google.android.tungsten.setupwraith` | Activo por ahora | Es dueño del Wi-Fi; solo hace falta si se cambia el launcher |
 | `com.google.android.apps.tv.dreamx` | Activo por ahora | Depende del launcher nuevo (salvapantallas del reloj) |
 | `com.google.android.apps.tv.launcherx` | Activo | El launcher queda para después |
@@ -63,26 +63,50 @@ por lista. Son la única copia del estado anterior, así que no hay que borrarlo
    `android.autoinstalls.config.google.gtvpai`, `com.google.android.partnersetup`
 2. **Apps que sobran:** `com.tcl.browser`, `com.google.android.play.games`,
    `com.google.android.feedback`, `com.android.tv.feedbackconsent`
+3. **Asistente:** `com.google.android.katniss`
 
-Deshacer un lote: `tools\restore.ps1 backup\tcl-g13\lote1.txt` (o `lote2.txt`).
+Deshacer un lote: `tools\restore.ps1 backup\tcl-g13\lote1.txt` (o `lote2.txt`, `lote3.txt`).
+
+La versión en inglés para el proyecto original está en `examples/tcl-50s5k/debloat.txt` (rama
+`examples/tcl-50s5k`).
 
 ## Resultados
 
-Los dos lotes se aplicaron el 2026-10-20 con `tools\disable.ps1`. Los 9 paquetes quedaron en
+Los tres lotes se aplicaron el 2026-10-20 con `tools\disable.ps1`. Los 10 paquetes quedaron en
 `disabled-user`. Ninguno pidió `TV_INPUT_HARDWARE` y ninguno era dueño de Home, así que las protecciones
 no omitieron nada.
 
 Comprobado por ADB después de cada lote:
 
-| Comprobación | Lote 1 | Lote 2 |
-|---|---|---|
-| Home (`resolve-activity`) | launcherx | launcherx |
-| Wi-Fi (`Supplicant state`) | `COMPLETED` | `COMPLETED` |
-| Internet (`ping 8.8.8.8`) | ok | ok |
-| Entradas de TV (`dumpsys tv_input`, `TvInputInfo`) | 10 | 10 |
+| Comprobación | Lote 1 | Lote 2 | Lote 3 |
+|---|---|---|---|
+| Home (`resolve-activity`) | launcherx | launcherx | launcherx |
+| Wi-Fi (`Supplicant state`) | `COMPLETED` | `COMPLETED` | `COMPLETED` |
+| Internet (`ping 8.8.8.8`) | ok | ok | ok |
+| Entradas de TV (`dumpsys tv_input`, `TvInputInfo`) | 10 | 10 | 10 |
 
-Pendiente de comprobar en la TV: botón Home del control, cada entrada HDMI con imagen, botón Input,
-YouTube/Netflix y el botón del micrófono (katniss sigue activo).
+Pendiente de comprobar en la TV: botón Home del control, cada entrada HDMI con imagen, botón Input y
+YouTube/Netflix.
+
+## Memoria y rendimiento
+
+No se midió antes de la limpieza, así que no hay comparación directa. Medidas después de los lotes 1 y 2
+(TV encendida hace 1 h):
+
+| Medida | Valor |
+|---|---|
+| RAM disponible (`MemAvailable`) | 272 MB de 954 MB |
+| Swap (zram) en uso | 321 MB de 700 MB |
+| CPU | 364 % libre de 400 % (el `load average` de unos 54 es normal en MediaTek) |
+| Arranque en frío de YouTube (`am start -W`, 3 veces) | 1527, 900, 1023 ms |
+| Arranque en frío de SmartTube (3 veces) | 1289, 1006, 992 ms |
+
+Mayores consumidores de RAM (PSS): launcherx + coreservices unos 125 MB, gms 64 MB, katniss unos 50 MB
+en dos procesos, ttvs 20 MB.
+
+Después del lote 3 (katniss), `MemAvailable` subió a 330 MB. Parte de esa subida viene de haber
+cerrado SmartTube durante la medición, así que no se puede atribuir toda al Asistente. Lo siguiente que más
+memoria liberaría es cambiar launcherx por el launcher de este repositorio.
 
 ## Bloqueo de anuncios
 
