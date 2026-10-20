@@ -1,0 +1,41 @@
+# TCL 50S5K QLED, Colombia (device G13, product G13_2K_GB, model "Smart TV", client_sku co), Google TV 14
+# (SDK 34), build UKN2.241110.001 AU07, software V8-T221T09-LF1V069, security patch 2025-06-01.
+# MediaTek MT9221-Lite (ro.hardware mt5867), about 1 GB RAM (954 MB, low_ram=true), 32-bit only (armeabi-v7a).
+# Same platform as examples/tcl-43s5k (India, AU10); this is the older Latin American firmware
+# (clienttype TCL-LA-MT9221-03). Every package below existed and was enabled before the run.
+#
+# Apply:   TV_HOST=<tv ip> tools/disable.sh examples/tcl-50s5k/debloat.txt
+# Undo:    TV_HOST=<tv ip> tools/restore.sh examples/tcl-50s5k/debloat.txt com.google.android.apps.tv.launcherx
+# Everything is DISABLED, not uninstalled. Comment out any line you want to keep.
+#
+# Stock launcher: com.google.android.apps.tv.launcherx (HOME priority 2), kept: this list is debloat only.
+# Other HOME answers: setupwraith/.RecoveryActivity (1), com.tcl.factory.view/.tv.FactoryTvActivity (0),
+# com.android.tv.settings/.system.FallbackHome (-1000).
+#
+# The saved Wi-Fi network was created by com.google.android.tungsten.setupwraith (cname= in dumpsys wifi),
+# so setupwraith stays until that network is forgotten and re-joined in Settings.
+#
+# Applied in two batches on 2026-10-20 with tools/disable.ps1 from Windows, over wireless debugging
+# (adb pair, then adb tcpip 5555 for tools/tv.py). No package was skipped by the Home, setupwraith or
+# TV_INPUT_HARDWARE guards. After each batch: Home still launcherx, Wi-Fi connected, internet up,
+# dumpsys tv_input still listed 10 inputs. Lived with for less than the few days CONTRIBUTING.md asks;
+# I'll report back if anything breaks. AdGuard Private DNS (dns.adguard-dns.com) set the same day.
+
+# Batch 1: TCL tracking, ads and auto-installs
+# com.tcl.ttvs                         # TCL analytics AND the firmware updater: kept on so updates arrive
+com.tcl.messagebox                     # TCL push messages and promos
+com.tcl.logkit                         # log capture and upload
+com.tcl.partnercustomizer              # TCL promo rows on the Google TV home
+android.autoinstalls.config.google.gtvpai   # silently installs partner apps
+com.google.android.partnersetup        # partner attribution (RLZ pings)
+
+# Batch 2: preloaded apps and extras not used on this unit
+com.tcl.browser                        # TCL "BrowseHere" browser and web-video portal
+com.google.android.play.games
+com.google.android.feedback
+com.android.tv.feedbackconsent
+# com.google.android.katniss           # Google Assistant voice (mic button): kept on by choice
+
+# Not disabled on this unit (see examples/tcl-43s5k for the launcher/ steps):
+# com.google.android.tungsten.setupwraith   # owns the saved Wi-Fi here; re-join the network first
+# com.google.android.apps.tv.dreamx         # Ambient mode screensaver; switch the screensaver first
